@@ -1,0 +1,13 @@
+using spline to fitted curve and minimizing the jerk as same to project Q&A. so I want to focus on the logic of lane change.
+In addition to the "too_close" variable defined project Q&A, I also defined the "too_too_close" variable,
+which happens if and only if vehicles on other lanes change lanes to my lane, so we should check "if (d<(2+4*lane+3) && d>(2+4*lane-3))"(code line:268), need to slow down if they are too close to my vehicle(code line:269-272, 389-391).
+Considering efficiency, it is easier to change lanes when the vehicle is on lane=1, because it can change lanes to lane=0 or lane=2.
+According to the greedy idea, we should try our best to keep the vehicle on lane=1, so when the vehicle is on lane=1, if there are vehicles in front of lane=0 or lane=2, we should not change lanes to lane=0 or lane=2(code line:432-490), and not only in case too_close=true to consider Lane change, but also when the vehicle is driving in lane=0 or lane=2, if other vehicles in front of within 100, and if there is a gap in lane=1, also consider lane change to lane=1(code line:494-586).
+the main of the the logic of lane change as follows(code line:279-380, 387-550):
+Firstly, confirm whether there are gaps on the new lane that needs to be lane change.
+Gap is defined as within  positive and negative of the "car_s". 
+Then, if there is a gap, whether there are other vehicles within the first 30 and the last 30 of the gap?
+(1) if there are vehicles within the first 30 and the last 30 of the gap, the condition of lane change is to make the reference speed of the vehicle less than or equal to the maximum speed of the vehicle within the first 30, and greater than or equal to the maximum speed of the vehicle within the last 30. Only in this way can safely change lanes.
+(2) if only within the first 30 of the gap vehicles exist, the condition of lane change is that the reference speed of the vehicle is less than or equal to the maximum speed of the vehicle within the first 30.
+(3) if only within the last 30 of the gap vehicles exist, the condition of lane change is that the reference speed of the vehicle is greater than or equal to the maximum speed of the vehicle within the last 30.
+(4) if there is no vehicle within the first 30 and the last 30 of the gap, the lane can be changed unconditionally.
